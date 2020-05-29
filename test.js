@@ -50,7 +50,7 @@ function run () {
 			.on('pageerror', ({ message }) => { pageError++; } )
 			.on('requestfailed', request => { requestError++; } )
 
-		  
+
 		  // info
 		  try { await page.goto(getApiUrl('getMeetings'), {waitUntil: 'networkidle2'}) } catch (e) { await page.waitForNavigation(); generalError++ };
 		  const apiCallStatusInfo = await page.evaluate(el => el?el.innerHTML:'NOTFOUND', await page.$('response returncode'));
@@ -83,7 +83,7 @@ function run () {
 		  console.log('stats-video-count: ' + videoCount);
 		  console.log('call-info-error-count: ' + (consoleError + pageError + requestError + generalError));
 		  console.log ('');
-		  
+
 		  // create
 		  generalError = 0;
 		  consoleError = 0;
@@ -105,7 +105,7 @@ function run () {
 		  console.log('call-create-status: ' + (apiCallStatusCreate === 'SUCCESS'?1:0));
 		  console.log('call-create-error-count: ' + (consoleError + pageError + requestError + generalError));
 		  console.log ('');
-		  
+
 		  // join
 		  generalError = 0;
 		  consoleError = 0;
@@ -140,8 +140,8 @@ function run () {
 		  //await page.screenshot({path: 'screenshot.png'});
 		  console.log('call-join-error-count: ' + (consoleError + pageError + requestError + generalError));
 		  console.log ('');
-		  
-		  
+
+
 		  // end
 		  generalError = 0;
 		  consoleError = 0;
@@ -153,14 +153,14 @@ function run () {
 			password: params.moderatorPW,
 			}), {waitUntil: 'networkidle2'}) } catch (e) { await page.waitForNavigation(); generalError++ };
 		  const apiCallStatusEnd = await page.evaluate(el => el?el.innerHTML:'NOTFOUND', await page.$('response returncode'));
-		  console.log('call-status-end: ' + (apiCallStatusEnd === 'SUCCESS'?1:0));
+		  console.log('call-end-status: ' + (apiCallStatusEnd === 'SUCCESS'?1:0));
 		  console.log('call-end-error-count: ' + (consoleError + pageError + requestError + generalError));
-		  
-		  await browser.close();
-		  
 
-		  
-		  
+		  await browser.close();
+
+
+
+
         } catch (e) {
             return reject(e);
         }
