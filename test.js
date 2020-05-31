@@ -50,7 +50,6 @@ function run () {
 			.on('pageerror', ({ message }) => { pageError++; } )
 			.on('requestfailed', request => { requestError++; } )
 
-
 		  // info
 		  try { await page.goto(getApiUrl('getMeetings'), {waitUntil: 'networkidle2'}) } catch (e) { await page.waitForNavigation(); generalError++ };
 		  const apiCallStatusInfo = await page.evaluate(el => el?el.innerHTML:'NOTFOUND', await page.$('response returncode'));
@@ -119,28 +118,25 @@ function run () {
 			redirect:params.redirect
 			}), {waitUntil: 'networkidle2'}) } catch (e) { await page.waitForNavigation(); generalError++ };
 		  const buttons = await page.$$('div.ReactModal__Content button');
-		  // click alleen luisteren button (0 = modal-close, 1 = microfoon, 2 = luisteren)
+		  // click listen button (0 = modal-close, 1 = microphone, 2 = listen)
 		  if (buttons && buttons.length > 2) await buttons[2].click();
-		  await page.waitFor(2000);
-		  // check of we de username op de juiste plek terug vinden met dezelfde waarde als die we verzonden
+		  // check did we found the username in the HTML on the right place and did the username matches the name we have send.
 		  const username = (await page.evaluate(el => el?el.innerHTML:'', await page.$('div[class^="participantsList--"] span[class^="userNameMain--"] span'))).replace(/\&nbsp;/g,' ').trim();
 		  console.log('test-success-username: ' + (username === params.fullName?1:0));
-		  // check of we de titel van der presentatie op de juiste plek terug vinden met dezelfde waarde als die we verzonden
+		  // check did we found the meetingname in the HTML on the right place and did the meetingname matches the name we have send.
 		  const presentationTitle = (await page.evaluate(el => el?el.innerHTML:'', await page.$('h1[class^="presentationTitle--"]'))).replace(/\&nbsp;/g,' ').trim();
 		  console.log('test-success-meetingname: ' + (presentationTitle === params.name?1:0));
-		  // check of de koptelefoon knop blauw is en zichtbaar.
-		  const audioButtonActiveAndVisible = await page.evaluate(() => {
-			const e = document.querySelector('div[class^="centerWithActions--"] button > span[class*="primary--"] > i[class*="icon-bbb-listen"]');
-			if (!e)
-				return false;
-			const style = window.getComputedStyle(e);
-			return style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-		  });
+		  // check is the headphone button visible and blue (did we join the audio channel).
+		  try {
+			audioButtonActiveAndVisible = await page.waitForSelector(
+				'div[class^="centerWithActions--"] button > span[class*="primary--"] > i[class*="icon-bbb-listen"]',
+				{ visible: true, hidden: false, timeout: 10000 } // timeout 10 sec
+			)
+			audioButtonActiveAndVisible = audioButtonActiveAndVisible?true:false;
+		  } catch (e) { audioButtonActiveAndVisible = false }
 		  console.log('test-success-audiobutton: ' + (audioButtonActiveAndVisible?1:0));
-		  //await page.screenshot({path: 'screenshot.png'});
 		  console.log('call-join-error-count: ' + (consoleError + pageError + requestError + generalError));
 		  console.log ('');
-
 
 		  // end
 		  generalError = 0;
@@ -157,9 +153,6 @@ function run () {
 		  console.log('call-end-error-count: ' + (consoleError + pageError + requestError + generalError));
 
 		  await browser.close();
-
-
-
 
         } catch (e) {
             return reject(e);
