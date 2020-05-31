@@ -120,12 +120,6 @@ function run () {
 		  const buttons = await page.$$('div.ReactModal__Content button');
 		  // click listen button (0 = modal-close, 1 = microphone, 2 = listen)
 		  if (buttons && buttons.length > 2) await buttons[2].click();
-		  // check did we found the username in the HTML on the right place and did the username matches the name we have send.
-		  const username = (await page.evaluate(el => el?el.innerHTML:'', await page.$('div[class^="participantsList--"] span[class^="userNameMain--"] span'))).replace(/\&nbsp;/g,' ').trim();
-		  console.log('test-success-username: ' + (username === params.fullName?1:0));
-		  // check did we found the meetingname in the HTML on the right place and did the meetingname matches the name we have send.
-		  const presentationTitle = (await page.evaluate(el => el?el.innerHTML:'', await page.$('h1[class^="presentationTitle--"]'))).replace(/\&nbsp;/g,' ').trim();
-		  console.log('test-success-meetingname: ' + (presentationTitle === params.name?1:0));
 		  // check is the headphone button visible and blue (did we join the audio channel).
 		  try {
 			audioButtonActiveAndVisible = await page.waitForSelector(
@@ -135,6 +129,12 @@ function run () {
 			audioButtonActiveAndVisible = audioButtonActiveAndVisible?true:false;
 		  } catch (e) { audioButtonActiveAndVisible = false }
 		  console.log('test-success-audiobutton: ' + (audioButtonActiveAndVisible?1:0));
+		  // check did we found the username in the HTML on the right place and did the username matches the name we have send.
+		  const username = (await page.evaluate(el => el?el.innerHTML:'', await page.$('div[class^="participantsList--"] span[class^="userNameMain--"] span'))).replace(/\&nbsp;/g,' ').trim();
+		  console.log('test-success-username: ' + (username === params.fullName?1:0));
+		  // check did we found the meetingname in the HTML on the right place and did the meetingname matches the name we have send.
+		  const presentationTitle = (await page.evaluate(el => el?el.innerHTML:'', await page.$('h1[class^="presentationTitle--"]'))).replace(/\&nbsp;/g,' ').trim();
+		  console.log('test-success-meetingname: ' + (presentationTitle === params.name?1:0));
 		  console.log('call-join-error-count: ' + (consoleError + pageError + requestError + generalError));
 		  console.log ('');
 
